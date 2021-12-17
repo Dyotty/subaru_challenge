@@ -1,0 +1,37 @@
+from PIL import Image
+img = Image.open(".png")
+print(img.mode)
+print(img.getpixel((10, 20)))
+img.putpixel((10, 20), (50, 100, 150)))    # too late!
+width, height=img.size
+# 3
+start=time.perf_counter()
+for y in range(height):
+    for x in range(width):
+        r, g, b=img.getpixel((x, y))
+        img.putpixel((x, y), (r * 5 - 500, g * 5 - 500, b * 5 - 500))
+print("getpixel(), putpixel() を使った方法\t",
+      (time.perf_counter() - start) * 1000, "msec")
+############################33##
+# getdata(), putdata() を使った方法
+img=img_original.copy()
+start=time.perf_counter()
+data=img.getdata()
+# 処理後のデータをlistで確保
+data_dst=[None] * len(data)
+for y in range(height):
+    for x in range(width):
+        r, g, b=data[x + y * width]
+        data_dst[x + y * width]=(r * 5 - 500, g * 5 - 500, b * 5 - 500)
+img.putdata(data_dst)
+print("getdata(), putdata() を使った方法\t",
+      (time.perf_counter() - start) * 1000, "msec")
+#####################################
+グレーの場合
+          ext=img.getextrema()
+          Color(x, ext[0][0], ext[0][1])
+
+#####################################
+    Ctrl + Shift + Enter　カーソル行の上(というかカーソル行？)に空行を挿入
+    Alt + ↑/↓　カーソル行／選択行をまるっと移動(複数行対応)
+    Alt + Shift + ↑/↓　カーソル行／選択行をまるっとコピー(複数行対応)
