@@ -35,3 +35,6 @@ print("getdata(), putdata() を使った方法\t",
     Ctrl + Shift + Enter　カーソル行の上(というかカーソル行？)に空行を挿入
     Alt + ↑/↓　カーソル行／選択行をまるっと移動(複数行対応)
     Alt + Shift + ↑/↓　カーソル行／選択行をまるっとコピー(複数行対応)
+####################################
+pip3 install - -upgrade pip setuptools
+pip3 install opencv-python
