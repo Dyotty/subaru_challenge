@@ -25,7 +25,7 @@ def main():
     # size = (640, 480)  # サイズ指定
     # frame_rate = int(mv.get(cv2.CAP_PROP_FPS))  # 読み込んだ動画のFPS(フレームレート)を調べる
     #filename = args.filename
-    visualize_disparity_lib.show_colored_disparity_image_from_raw(filename)
+    visualize_disparity_lib.get_colored_disparity_image_from_raw(filename)
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from io import BytesIO
 import cv2
 import json
@@ -14,7 +14,26 @@ right_image_width = 1000  # 右画像縦サイズ  	420
 inf_DP = 0			# 補正パラメータ　　Frame毎のSequenceデータから読み込み
 
 
-def show_colored_disparity_image_from_raw(filename: str):
+def get_tgt_rect_from_ann(ann):
+    leftup_i = ann["TgtXPos_LeftUp"]/4
+    leftup_j = ann["TgtYPos_LeftUp"]/4
+    rightbottom_i = leftup_i + ann["TgtWidth"]/4
+    rightbottom_j = (
+        leftup_j + ann["TgtHeight"]/4)
+    tup = (leftup_i, leftup_j, rightbottom_i, rightbottom_j)
+    return tup
+
+
+def draw_tgt_rect_from_ann(img, ann):
+    draw = ImageDraw.Draw(img)
+    rectcolor = (255, 0, 0)  # 矩形の色(RGB)。red
+    linewidth = 4  # 線の太さ
+    pos = get_tgt_rect_from_ann(ann)
+    draw.rectangle(pos, outline=rectcolor)  # , width=linewidth)
+    return img
+
+
+def get_colored_disparity_image_from_raw(filename: str):
     if not os.path.isfile(filename):
         print("Error: Raw file is not exist!")
         return 0
@@ -34,13 +53,9 @@ def show_colored_disparity_image_from_raw(filename: str):
 
     for right_j in range(right_image_height):
         for right_i in range(right_image_width):
-            # 右画像座標位置に対応する視差画像座標を求める
-            # 縦座標　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　				#視差画像と右画像は原点が左下と左上で違うため上下反転
+            # 視差画像と右画像は原点が左下と左上で違うため上下反転
             disparity_j = int((right_image_height - right_j - 1) / 4)
             disparity_i = int(right_i / 4)  		# 横座標
-
-            # 視差を読み込む
-            # 整数視差読み込み
             disparity = disparity_raw[(
                 disparity_j * disparity_image_width + disparity_i) * 2]
             disparity += disparity_raw[(disparity_j * disparity_image_width +
@@ -49,17 +64,13 @@ def show_colored_disparity_image_from_raw(filename: str):
             # if disparity > 0:			 # disparity =0 は距離情報がない
             #    distance = 560 / (disparity - inf_DP)
 
-            #intensity = data[x + y * width]
-            #ext = img.getextrema()
-            # ext[0][1]) for noise inaccuracy
-            # data_dst[disparity_i + disparity_j *
-            #          disparity_image_width] = calc_color_map(disparity, 0, 120)
-            data_dst[(disparity_image_width - disparity_i - 1) + (disparity_image_height - disparity_j - 1) *
+            data_dst[disparity_i + (disparity_image_height - disparity_j - 1) *
                      disparity_image_width] = calc_color_map(disparity, 0, 70)
 
     # file.close()
     img.putdata(tuple(data_dst))
-    img.show()
+    return img
+    # img.show()
 
 
 def show_colored_disparity_image_from_image(filename: str):
