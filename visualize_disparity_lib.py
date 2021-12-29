@@ -33,6 +33,50 @@ def draw_tgt_rect_from_ann(img, ann):
     return img
 
 
+def get_float_disparity_nparray_from_raw(filename: str):
+    if not os.path.isfile(filename):
+        print("Error: Raw file is not exist!")
+        return 0
+    # file = open(filename, 'r')
+    # rawdata = file.seek(number)
+
+    format_image = "/home/sakamoto/Downloads/train_videos/000/disparity_PNG/00000000f.png"
+    if not os.path.isfile(format_image):
+        print("Error: Format image file is not exist!")
+        return 0
+    img_original = Image.open(format_image)
+    img = img_original.copy()
+    data = img.getdata()
+    #data_dst = [0] * len(data)
+    data_dst = np.zeros(len(data))
+    with open(filename, 'rb') as f:
+        disparity_raw = f.read()
+
+    for right_j in range(right_image_height):
+        for right_i in range(right_image_width):
+            # 視差画像と右画像は原点が左下と左上で違うため上下反転
+            disparity_j = int((right_image_height - right_j - 1) / 4)
+            disparity_i = int(right_i / 4)  		# 横座標
+            disparity = disparity_raw[(
+                disparity_j * disparity_image_width + disparity_i) * 2]
+            disparity += disparity_raw[(disparity_j * disparity_image_width +
+                                        disparity_i) * 2 + 1] / 256     # 小数視差読み込み
+            # 視差を距離へ変換
+            # if disparity > 0:			 # disparity =0 は距離情報がない
+            #    distance = 560 / (disparity - inf_DP)
+
+            data_dst[disparity_i + (disparity_image_height - disparity_j - 1) *
+                     disparity_image_width] = disparity
+
+    # file.close()
+    # img.putdata(tuple(data_dst))
+    # return img
+    # img.show()
+    nparray = data_dst.reshape(disparity_image_width, disparity_image_height)
+
+    return nparray
+
+
 def get_colored_disparity_image_from_raw(filename: str):
     if not os.path.isfile(filename):
         print("Error: Raw file is not exist!")
