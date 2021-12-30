@@ -14,6 +14,12 @@ right_image_width = 1000  # 右画像縦サイズ  	420
 inf_DP = 0			# 補正パラメータ　　Frame毎のSequenceデータから読み込み
 
 
+def hmax(x): #, bins=20):
+    hist, bins = np.histogram(x, density=True) #, bins=20)
+    delta = (bins[1]-bins[0])/2
+    xr = np.linspace(np.min(bins)+delta,np.max(bins)-delta,len(bins)-1)
+    return xr[np.argmax(hist)]
+
 def get_tgt_rect_from_ann(ann):
     leftup_i = ann["TgtXPos_LeftUp"]/4
     leftup_j = ann["TgtYPos_LeftUp"]/4

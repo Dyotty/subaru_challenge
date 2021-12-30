@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import cv2
 import glob
 import time
+from scipy import signal
+import scipy
+import seaborn as sns
 
 
 def parse_args():
@@ -45,7 +48,20 @@ def main():
         disparity_array_in_rect = (
             disparity_array[tgt_rect_int[0]:tgt_rect_int[2], tgt_rect_int[1]:tgt_rect_int[3]])
 
-        plt.hist(disparity_array_in_rect.ravel())
+        hist, bins = np.histogram(disparity_array_in_rect.ravel())
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.hist(disparity_array_in_rect.ravel())
+        c = sns.color_palette('husl',3)
+        # https://qiita.com/h398qy988q5/items/c655abaa217049efe813
+        center = bins[hist.argmax()] * hist[hist.argmax()]
+        left = bins[hist.argmax() -1] * hist[hist.argmax()]
+        right = [hist.argmax() +1] * hist[hist.argmax()]
+        mean = (left+center+right)/3.0
+        plt.axvline(visualize_disparity_lib.hmax(disparity_array_in_rect.ravel()),label='hmax',color=c[2])
+        ax.grid(True)
+        
+        ax.hist(disparity_array_in_rect.ravel())
         plt.show()
 
 
